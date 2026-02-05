@@ -13,6 +13,8 @@ public:
 	void handleInput(float dt) override;
 	void update(float dt) override;
 
+	void SetWorldSize(sf::Vector2f);
+
 private:
 	const float ACCELERATION = 20.0f;
 	const float DRAG_FACTOR = 0.9f;
@@ -20,6 +22,9 @@ private:
 
 	const float APPROX_ONE_OVER_ROOT_TWO = 0.70710678f;	// 1 / sqrt(2)
 
+	sf::Vector2f m_worldSize;
+
+	// animations
 	Animation m_walkDown;
 	Animation m_walkUp;
 	Animation m_walkUpRight;
@@ -27,5 +32,6 @@ private:
 	Animation m_walkDownRight;
 
 	Animation* m_currentAnimation;
+
 };
 

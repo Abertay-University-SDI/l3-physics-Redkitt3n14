@@ -141,4 +141,24 @@ void Sheep::update(float dt)
 	m_velocity = (m_velocity + (m_acceleration * 1.0f)) * DRAG_FACTOR;
 
 	move(m_velocity * dt );
+
+	sf::Vector2f pos = getPosition();
+	if (pos.x > m_worldSize.x) {
+		setPosition({ m_worldSize.x, pos.y });
+	}
+	else if (pos.x < 0) {
+		setPosition({ 0, pos.y });
+	}
+
+	if (pos.y > m_worldSize.y) {
+		setPosition({ pos.x,m_worldSize.y });
+	}
+	else if (pos.y < 0) {
+		setPosition({ pos.x,0 });
+	}
+}
+
+void Sheep::SetWorldSize(sf::Vector2f sizeIn)
+{
+	m_worldSize = sizeIn;
 }

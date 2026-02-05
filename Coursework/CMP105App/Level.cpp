@@ -18,6 +18,8 @@ Level::Level(sf::RenderWindow& hwnd, Input& in) :
 	m_sheep.setPosition({ background_size / 2.f, background_size / 2.f });
 	m_sheep.setSize({ 64,64 });
 
+	m_sheep.SetWorldSize({ 1024,1024 });
+
 	// Setup pigs.
 	std::vector<sf::Vector2f> pig_locations = {	// top corners and bottom middle
 		{background_size * .33f, background_size * .25f },
