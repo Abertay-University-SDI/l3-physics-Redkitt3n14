@@ -130,6 +130,11 @@ void Pig::setRandomDirection()
 	}
 }
 
+void Pig::collisionResponse(GameObject collider)
+{
+	std::cout << "sheepy collision" << std::endl;
+}
+
 void Pig::update(float dt)
 {
     // tick down

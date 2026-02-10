@@ -11,6 +11,7 @@ public:
 
 	void update(float dt) override;
 	void setRandomDirection();
+	void collisionResponse(GameObject);
 
 private:
 	// direction used for flipping animation on top/bottom

@@ -1,4 +1,5 @@
 #include "Level.h"
+#include "Framework/Collision.h"
 
 Level::Level(sf::RenderWindow& hwnd, Input& in) :
 	BaseLevel(hwnd, in)
@@ -19,6 +20,7 @@ Level::Level(sf::RenderWindow& hwnd, Input& in) :
 	m_sheep.setSize({ 64,64 });
 
 	m_sheep.SetWorldSize({ 1024,1024 });
+	m_sheep.setCollisionBox(2, 2, 60, 60);
 
 	// Setup pigs.
 	std::vector<sf::Vector2f> pig_locations = {	// top corners and bottom middle
@@ -35,6 +37,8 @@ Level::Level(sf::RenderWindow& hwnd, Input& in) :
 		new_pig->setSize({ 64, 64 });
 		new_pig->setPosition(pig_locations[i]);	
 		m_pigPointers.push_back(new_pig);
+
+		new_pig->setCollisionBox(2, 2, 60, 60);
 	}
 	
 	m_gameOver = false;	// haven't lost yet.
@@ -67,10 +71,22 @@ void Level::update(float dt)
 	sf::Vector2f pos = m_sheep.getPosition();
 	sf::View view = m_window.getView();
 	view.setCenter(pos);
+	if (m_shakeTimer > 0.f) {
+		m_shakeTimer -= dt;
+	}
 	m_window.setView(view);
 
 	m_sheep.update(dt);
-	for (auto pig : m_pigPointers) pig->update(dt);
+	for (auto pig : m_pigPointers)
+	{
+		pig->update(dt);
+		if (Collision::checkBoundingBox(ms_sheep, *pig)) { // checkBoundingBox checks if the 2 colliders are touching - useful!
+			pig->collisionResponse(m_sheep);
+			m_sheep.collisionResponse(*pig);
+			m_shakeTimer = SHAKE_TIME;
+		}
+	}
+
 }
 
 // Render level

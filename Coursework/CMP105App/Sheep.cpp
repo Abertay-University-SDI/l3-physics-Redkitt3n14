@@ -121,12 +121,27 @@ void Sheep::handleInput(float dt)
 			m_currentAnimation = &m_walkDown;
 		}
 	}
+
+	// normalise the diagonal movements
+	if (input_dir.length() > 1) {
+		input_dir = input_dir.normalized();
+	}
 	
 	// sets acceleration
 	m_acceleration = input_dir * ACCELERATION;
 
 }
 
+void Sheep::collisionResponse(GameObject collider)
+{
+	m_velocity *= -COEFF_OF_RESTITUTION;
+	if (m_velocity.lengthSquared() < 200) {
+		move(m_velocity * 0.5f);
+	}
+	else {
+		move(m_velocity * 0.05f); // clear the zone
+	}
+}
 
 void Sheep::update(float dt)
 {
@@ -134,31 +149,39 @@ void Sheep::update(float dt)
 	if (m_acceleration.x != 0 || m_acceleration.y != 0)
 		m_currentAnimation->animate(dt);
 
+	// caluclate movement needed for dt since last move
+	move(m_velocity * dt);
+
+	// check if there is a wall collision - inverts motion axis if so
+	m_velocity = checkWallAndBounce(m_velocity);
+
 	// move the sheep
-	if (m_acceleration.x && m_acceleration.y) { // diagonal slower downer
-		m_acceleration *= APPROX_ONE_OVER_ROOT_TWO;
-	}
 	m_velocity = (m_velocity + (m_acceleration * 1.0f)) * DRAG_FACTOR;
 
-	move(m_velocity * dt );
-
-	sf::Vector2f pos = getPosition();
-	if (pos.x > m_worldSize.x) {
-		setPosition({ m_worldSize.x, pos.y });
-	}
-	else if (pos.x < 0) {
-		setPosition({ 0, pos.y });
-	}
-
-	if (pos.y > m_worldSize.y) {
-		setPosition({ pos.x,m_worldSize.y });
-	}
-	else if (pos.y < 0) {
-		setPosition({ pos.x,0 });
-	}
 }
 
 void Sheep::SetWorldSize(sf::Vector2f sizeIn)
 {
 	m_worldSize = sizeIn;
+}
+
+sf::Vector2f Sheep::checkWallAndBounce(sf::Vector2f m_velocity) {
+
+	sf::Vector2f pos = getPosition();
+
+	if ((pos.x + getSize().x > m_worldSize.x) && (m_velocity.x > 0)) {
+		m_velocity.x *= -COEFF_OF_RESTITUTION;
+	}
+	else if ((pos.x < 0) && (m_velocity.x < 0)) {
+		m_velocity.x *= -COEFF_OF_RESTITUTION;
+	}
+
+	if ((pos.y + getSize().y > m_worldSize.y) && (m_velocity.y > 0)) {
+		m_velocity.y *= -COEFF_OF_RESTITUTION;
+	}
+	else if ((pos.y < 0) && (m_velocity.y < 0)) {
+		m_velocity.y *= -COEFF_OF_RESTITUTION;
+	}
+
+	return m_velocity;
 }
